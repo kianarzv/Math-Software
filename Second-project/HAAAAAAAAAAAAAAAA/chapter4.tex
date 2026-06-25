@@ -1,0 +1,677 @@
+\chapter{نتایج عددی و تحلیل همگرایی}\label{ch:results}
+
+\section{مقدمه}
+
+در فصل‌های پیشین، مبانی نظری و الگوریتم روش نیوتن برای حل معادلات غیرخطی بررسی شد. 
+در این فصل، عملکرد این روش از دیدگاه عددی مطالعه می‌شود. هدف اصلی این فصل، ارزیابی عملی روش نیوتن در حل چند معادله غیرخطی و بررسی رفتار همگرایی آن است.
+
+روش نیوتن برای حل معادله کلی
+\begin{equation}
+f(x)=0
+\label{eq:ch4-fzero}
+\end{equation}
+به صورت تکراری از رابطه زیر استفاده می‌کند:
+\begin{equation}
+x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}.
+\label{eq:ch4-newton}
+\end{equation}
+
+در تحلیل عددی این روش، معیارهای زیر اهمیت زیادی دارند:
+\begin{itemize}
+\item تعداد تکرارهای لازم برای رسیدن به دقت مطلوب؛
+\item مقدار خطای تقریبی در هر تکرار؛
+\item رفتار همگرایی روش؛
+\item تأثیر حدس اولیه بر نتیجه نهایی؛
+\item احتمال شکست روش در شرایط خاص.
+\end{itemize}
+
+در این فصل، معیار توقف اصلی به صورت زیر در نظر گرفته می‌شود:
+\begin{equation}
+|x_{n+1}-x_n|<\varepsilon,
+\label{eq:ch4-stop-diff}
+\end{equation}
+که در آن مقدار تلورانس برابر است با $\varepsilon = 10^{-6}$.
+
+همچنین برای برخی مثال‌ها، خطای واقعی نسبت به ریشه دقیق یا ریشه تقریبی بسیار دقیق نیز محاسبه می‌شود:
+\begin{equation}
+e_n = |x_n-\alpha|,
+\label{eq:ch4-error}
+\end{equation}
+که در آن $\alpha$ ریشه واقعی معادله است.
+
+\section{معیارهای ارزیابی عددی}
+
+برای ارزیابی عملکرد روش نیوتن، از چند معیار عددی استفاده می‌شود. مهم‌ترین این معیارها عبارت‌اند از:
+
+\subsection{خطای مطلق}
+
+اگر $\alpha$ ریشه دقیق معادله باشد، خطای مطلق در تکرار $n$ مطابق رابطه \eqref{eq:ch4-error} تعریف می‌شود. هرچه مقدار $e_n$ کوچک‌تر باشد، تقریب $x_n$ به ریشه واقعی نزدیک‌تر است.
+
+\subsection{اختلاف دو تقریب متوالی}
+
+در بسیاری از مسائل عملی، مقدار دقیق ریشه مشخص نیست. بنابراین به جای خطای واقعی، از اختلاف دو تقریب متوالی استفاده می‌شود:
+\begin{equation}
+d_n = |x_n-x_{n-1}|.
+\label{eq:ch4-diff}
+\end{equation}
+اگر این مقدار از تلورانس مشخص‌شده کمتر شود، الگوریتم متوقف می‌شود.
+
+\subsection{مرتبه همگرایی}
+
+اگر دنباله $\{x_n\}$ به ریشه $\alpha$ همگرا شود، مرتبه همگرایی $p$ به گونه‌ای تعریف می‌شود که:
+\begin{equation}
+\lim_{n\to\infty}\frac{|e_{n+1}|}{|e_n|^p}=C,
+\label{eq:ch4-order}
+\end{equation}
+که در آن $C$ یک ثابت مثبت است. برای روش نیوتن، تحت شرایط مناسب، مرتبه همگرایی برابر با ۲ است؛ یعنی:
+\begin{equation}
+e_{n+1}\approx C e_n^2.
+\label{eq:ch4-quadratic}
+\end{equation}
+بنابراین انتظار می‌رود پس از نزدیک شدن به ریشه، تعداد ارقام صحیح تقریباً در هر تکرار دو برابر شود.
+
+\section{مثال اول: حل معادله چندجمله‌ای}
+\label{sec:examples}
+
+در این مثال معادله زیر بررسی می‌شود:
+\begin{equation}
+f(x)=x^3-x-1.
+\label{eq:ch4-ex1-func}
+\end{equation}
+مشتق تابع برابر است با:
+\begin{equation}
+f'(x)=3x^2-1.
+\label{eq:ch4-ex1-deriv}
+\end{equation}
+ریشه حقیقی این معادله تقریباً برابر است با:
+\[
+\alpha \approx 1.324718.
+\]
+حدس اولیه به صورت زیر انتخاب می‌شود:
+\[
+x_0=1.
+\]
+فرمول تکراری روش نیوتن برای این تابع به شکل زیر خواهد بود:
+\begin{equation}
+x_{n+1}
+=
+x_n-\frac{x_n^3-x_n-1}{3x_n^2-1}.
+\label{eq:ch4-ex1-newton}
+\end{equation}
+
+\subsection{جدول نتایج عددی}
+
+نتایج اجرای روش نیوتن برای این مثال در جدول \ref{tab:newton-example1} آورده شده است.
+
+\begin{table}[H]
+\centering
+\caption{نتایج روش نیوتن برای تابع $f(x)=x^3-x-1$}
+\label{tab:newton-example1}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{c c c c}
+\toprule[1.3pt]
+شماره تکرار $n$ & مقدار $x_n$ & $|x_n-x_{n-1}|$ & $|x_n-\alpha|$ \\
+\midrule[1pt]
+0 & 1.000000 & -- & 0.324718 \\
+1 & 1.500000 & 0.500000 & 0.175282 \\
+2 & 1.347826 & 0.152174 & 0.023108 \\
+3 & 1.325200 & 0.022626 & 0.000482 \\
+4 & 1.324718 & 0.000482 & کمتر از $10^{-6}$ \\
+\bottomrule[1.3pt]
+\end{tabular}
+\end{table}
+
+همان‌طور که مشاهده می‌شود، روش نیوتن تنها در چند تکرار به جواب دقیق با خطای بسیار کوچک می‌رسد. این موضوع نشان‌دهنده سرعت بالای همگرایی روش است.
+
+\subsection{تحلیل همگرایی مثال اول}
+
+برای بررسی همگرایی درجه دوم، نسبت زیر محاسبه می‌شود:
+\begin{equation}
+Q_n=\frac{e_{n+1}}{e_n^2}.
+\label{eq:ch4-qn}
+\end{equation}
+اگر روش دارای همگرایی درجه دوم باشد، مقدار $Q_n$ در تکرارهای پایانی تقریباً به یک مقدار ثابت میل می‌کند.
+
+\begin{table}[H]
+\centering
+\caption{بررسی تجربی همگرایی درجه دوم در مثال اول}
+\label{tab:quadratic-example1}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{c c c}
+\toprule[1.3pt]
+$n$ & $e_n$ & $\dfrac{e_{n+1}}{e_n^2}$ \\
+\midrule[1pt]
+1 & 0.175282 & 0.752 \\
+2 & 0.023108 & 0.903 \\
+3 & 0.000482 & تقریباً ثابت \\
+\bottomrule[1.3pt]
+\end{tabular}
+\end{table}
+
+نتایج جدول \ref{tab:quadratic-example1} نشان می‌دهد که پس از نزدیک شدن تقریب‌ها به ریشه، رفتار خطا با رابطه \eqref{eq:ch4-quadratic} سازگار است. بنابراین همگرایی درجه دوم روش نیوتن از دیدگاه عددی نیز تأیید می‌شود.
+
+\section{مثال دوم: حل معادله نمایی}
+
+در این مثال تابع زیر در نظر گرفته می‌شود:
+\begin{equation}
+f(x)=e^{-x}-x.
+\label{eq:ch4-ex2-func}
+\end{equation}
+مشتق تابع برابر است با:
+\begin{equation}
+f'(x)=-e^{-x}-1.
+\label{eq:ch4-ex2-deriv}
+\end{equation}
+ریشه این معادله تقریباً برابر است با:
+\[
+\alpha \approx 0.567143.
+\]
+این عدد در ریاضیات به عنوان جواب معادله $x=e^{-x}$ شناخته می‌شود. حدس اولیه را به صورت زیر انتخاب می‌کنیم:
+\[
+x_0=0.
+\]
+فرمول تکراری نیوتن برای این تابع برابر است با:
+\begin{equation}
+x_{n+1}
+=
+x_n-\frac{e^{-x_n}-x_n}{-e^{-x_n}-1}.
+\label{eq:ch4-ex2-newton}
+\end{equation}
+
+\subsection{جدول نتایج عددی}
+
+\begin{table}[H]
+\centering
+\caption{نتایج روش نیوتن برای تابع $f(x)=e^{-x}-x$}
+\label{tab:newton-example2}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{c c c c}
+\toprule[1.3pt]
+شماره تکرار $n$ & مقدار $x_n$ & $|x_n-x_{n-1}|$ & $|x_n-\alpha|$ \\
+\midrule[1pt]
+0 & 0.000000 & -- & 0.567143 \\
+1 & 0.500000 & 0.500000 & 0.067143 \\
+2 & 0.566311 & 0.066311 & 0.000832 \\
+3 & 0.567143 & 0.000832 & کمتر از $10^{-6}$ \\
+\bottomrule[1.3pt]
+\end{tabular}
+\end{table}
+
+این مثال نیز نشان می‌دهد که روش نیوتن با انتخاب حدس اولیه مناسب، در تعداد کمی تکرار به ریشه معادله همگرا می‌شود.
+
+\subsection{تحلیل نتیجه}
+
+در این مثال تابع $f(x)=e^{-x}-x$ پیوسته و مشتق‌پذیر است و مشتق آن در نزدیکی ریشه صفر نمی‌شود. بنابراین شرایط مناسب برای همگرایی روش نیوتن برقرار است. کاهش سریع خطا در جدول \ref{tab:newton-example2} نیز نشان می‌دهد که روش به صورت پایدار به ریشه همگرا شده است.
+
+\section{مثال سوم: حل معادله مثلثاتی}
+
+اکنون معادله غیرخطی زیر را بررسی می‌کنیم:
+\begin{equation}
+f(x)=\cos x - x.
+\label{eq:ch4-ex3-func}
+\end{equation}
+مشتق تابع برابر است با:
+\begin{equation}
+f'(x)=-\sin x-1.
+\label{eq:ch4-ex3-deriv}
+\end{equation}
+ریشه این معادله تقریباً برابر است با:
+\[
+\alpha \approx 0.739085.
+\]
+حدس اولیه را به صورت زیر در نظر می‌گیریم:
+\[
+x_0=1.
+\]
+فرمول تکراری نیوتن برای این تابع برابر است با:
+\begin{equation}
+x_{n+1}
+=
+x_n-\frac{\cos x_n-x_n}{-\sin x_n-1}.
+\label{eq:ch4-ex3-newton}
+\end{equation}
+
+\subsection{جدول نتایج عددی}
+
+\begin{table}[H]
+\centering
+\caption{نتایج روش نیوتن برای تابع $f(x)=\cos x-x$}
+\label{tab:newton-example3}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{c c c c}
+\toprule[1.3pt]
+شماره تکرار $n$ & مقدار $x_n$ & $|x_n-x_{n-1}|$ & $|x_n-\alpha|$ \\
+\midrule[1pt]
+0 & 1.000000 & -- & 0.260915 \\
+1 & 0.750364 & 0.249636 & 0.011279 \\
+2 & 0.739113 & 0.011251 & 0.000028 \\
+3 & 0.739085 & 0.000028 & کمتر از $10^{-6}$ \\
+\bottomrule[1.3pt]
+\end{tabular}
+\end{table}
+
+همان‌گونه که مشاهده می‌شود، در این مثال نیز روش نیوتن تنها پس از چند تکرار به جواب دقیق می‌رسد.
+
+\section{نمودارهای همگرایی}
+\label{sec:plots}
+
+یکی از روش‌های مناسب برای نمایش سرعت همگرایی، رسم خطا بر حسب شماره تکرار است. از آنجا که مقدار خطا در روش نیوتن معمولاً بسیار سریع کاهش می‌یابد، محور عمودی به صورت لگاریتمی در نظر گرفته می‌شود.
+
+\begin{figure}[H]
+\centering
+
+\begin{subfigure}{0.48\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+width=\textwidth,
+height=6cm,
+xlabel={شماره تکرار},
+ylabel={خطا},
+ymode=log,
+grid=both,
+title={مثال اول}
+]
+\addplot[mark=*] coordinates {
+(0,0.324718)
+(1,0.175282)
+(2,0.023108)
+(3,0.000482)
+(4,0.000001)
+};
+\end{axis}
+\end{tikzpicture}
+\caption{$x^3-x-1=0$}
+\label{fig:sub-ex1}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+width=\textwidth,
+height=6cm,
+xlabel={شماره تکرار},
+ylabel={خطا},
+ymode=log,
+grid=both,
+title={مثال دوم}
+]
+\addplot[mark=square*] coordinates {
+(0,0.567143)
+(1,0.067143)
+(2,0.000832)
+(3,0.000001)
+};
+\end{axis}
+\end{tikzpicture}
+\caption{$e^{-x}-x=0$}
+\label{fig:sub-ex2}
+\end{subfigure}
+
+\vspace{0.5cm}
+
+\begin{subfigure}{0.6\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+width=\textwidth,
+height=6cm,
+xlabel={شماره تکرار},
+ylabel={خطا},
+ymode=log,
+grid=both,
+title={مثال سوم}
+]
+\addplot[mark=triangle*] coordinates {
+(0,0.260915)
+(1,0.011279)
+(2,0.000028)
+(3,0.000001)
+};
+\end{axis}
+\end{tikzpicture}
+\caption{$\cos x-x=0$}
+\label{fig:sub-ex3}
+\end{subfigure}
+
+\caption{نمودارهای لگاریتمی کاهش خطا برای سه مثال عددی}
+\label{fig:error-subplots}
+\end{figure}
+
+در شکل \ref{fig:error-subplots}، زیرشکل \ref{fig:sub-ex1} کاهش خطا را برای معادله چندجمله‌ای $x^3-x-1=0$، زیرشکل \ref{fig:sub-ex2} برای معادله نمایی $e^{-x}-x=0$ و زیرشکل \ref{fig:sub-ex3} برای معادله مثلثاتی $\cos x-x=0$ نشان می‌دهد. همان‌طور که در این نمودارها دیده می‌شود، پس از چند تکرار ابتدایی، خطا به سرعت کاهش می‌یابد. این کاهش سریع با ماهیت همگرایی درجه دوم روش نیوتن (\eqref{eq:ch4-quadratic}) سازگار است.
+
+\section{مقایسه نتایج سه مثال}
+
+برای مقایسه بهتر عملکرد روش نیوتن، تعداد تکرارهای لازم برای رسیدن به دقت $\varepsilon=10^{-6}$ در جدول \ref{tab:comparison} آورده شده است.
+
+\begin{table}[H]
+\centering
+\caption{مقایسه عملکرد روش نیوتن در سه مثال}
+\label{tab:comparison}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{|>{\centering\arraybackslash}p{2.5cm} !{\color{blue}\vrule width 2pt} >{\centering\arraybackslash}p{2cm} |>{\centering\arraybackslash}p{2.5cm} >{\centering\arraybackslash}p{2cm}|}
+\hline
+\rowcolor{blue!20}
+تابع & حدس اولیه & ریشه تقریبی & تعداد تکرار \\
+\noalign{\global\setlength{\arrayrulewidth}{2pt}}\hline\noalign{\global\setlength{\arrayrulewidth}{0.4pt}}
+\rowcolor{white}
+$x^3-x-1$ & $1$ & $1.324718$ & $4$ \\
+\rowcolor{blue!20}
+$e^{-x}-x$ & $0$ & $0.567143$ & $3$ \\
+\rowcolor{white}
+$\cos x-x$ & $1$ & $0.739085$ & $3$ \\
+\hline
+\end{tabular}
+\end{table}
+
+بر اساس جدول \ref{tab:comparison}، روش نیوتن در هر سه مثال با تعداد تکرار کمی به جواب رسیده است. این موضوع یکی از مهم‌ترین مزیت‌های روش نیوتن نسبت به بسیاری از روش‌های عددی دیگر مانند روش تنصیف است.
+
+\section{مقایسه کیفی با روش‌های دیگر}
+\label{sec:comp}
+
+روش نیوتن را می‌توان از نظر سرعت همگرایی با روش‌هایی مانند روش تنصیف و روش سکانت مقایسه کرد.
+
+\subsection{مقایسه با روش تنصیف}
+
+روش تنصیف یکی از روش‌های پایدار برای حل معادلات غیرخطی است. این روش در صورتی قابل استفاده است که تابع در دو سر بازه تغییر علامت داشته باشد. مزیت اصلی روش تنصیف، تضمین همگرایی آن است. اما سرعت همگرایی آن خطی است.
+
+در روش تنصیف، طول بازه در هر مرحله نصف می‌شود. بنابراین همگرایی آن نسبتاً کند است. در مقابل، روش نیوتن اگر با حدس اولیه مناسب شروع شود، دارای همگرایی درجه دوم (\eqref{eq:ch4-quadratic}) است و بسیار سریع‌تر به جواب می‌رسد.
+
+\subsection{مقایسه با روش سکانت}
+
+روش سکانت از رابطه‌ای مشابه روش نیوتن استفاده می‌کند، اما به جای مشتق دقیق، مشتق را با تقریب تفاضلی محاسبه می‌کند. مرتبه همگرایی روش سکانت تقریباً برابر است با:
+\begin{equation}
+p \approx 1.618.
+\label{eq:ch4-secant-order}
+\end{equation}
+در حالی که مرتبه همگرایی روش نیوتن برابر است با:
+\begin{equation}
+p=2.
+\label{eq:ch4-newton-order}
+\end{equation}
+بنابراین از نظر سرعت همگرایی، روش نیوتن معمولاً سریع‌تر از روش سکانت است. البته روش سکانت این مزیت را دارد که نیازی به محاسبه مشتق ندارد.
+
+\begin{table}[H]
+\centering
+\caption{مقایسه کیفی روش‌های حل معادلات غیرخطی}
+\label{tab:method-comparison}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{c c c c}
+\toprule[1.3pt]
+روش & نیاز به مشتق & مرتبه همگرایی & ویژگی اصلی \\
+\midrule[1pt]
+تنصیف & ندارد & خطی & پایدار ولی کند \\
+سکانت & ندارد & حدود $1.618$ (\eqref{eq:ch4-secant-order}) & سریع‌تر از تنصیف \\
+نیوتن & دارد & $2$ (\eqref{eq:ch4-newton-order}) & بسیار سریع در نزدیکی ریشه \\
+\bottomrule[1.3pt]
+\end{tabular}
+\end{table}
+
+\section{بررسی اثر حدس اولیه}
+
+یکی از مهم‌ترین نکات در استفاده از روش نیوتن، انتخاب حدس اولیه مناسب است. برخلاف روش تنصیف، روش نیوتن همگرایی تضمین‌شده برای هر حدس اولیه ندارد. اگر حدس اولیه به ریشه نزدیک باشد، روش معمولاً بسیار سریع همگرا می‌شود. اما اگر حدس اولیه نامناسب انتخاب شود، ممکن است روش دچار واگرایی یا نوسان شود.
+
+برای مثال، اگر مقدار مشتق در نزدیکی حدس اولیه بسیار کوچک باشد، جمله
+\[
+\frac{f(x_n)}{f'(x_n)}
+\]
+بسیار بزرگ می‌شود و تقریب بعدی ممکن است از ریشه دور شود.
+
+به طور کلی انتخاب حدس اولیه مناسب باید بر اساس اطلاعاتی مانند نمودار تابع، تغییر علامت تابع یا تحلیل تقریبی مسئله انجام شود.
+
+\subsection{اثر حدس اولیه در مثال اول}
+
+برای تابع $f(x)=x^3-x-1$ (\eqref{eq:ch4-ex1-func}) چند حدس اولیه مختلف بررسی می‌شود.
+
+\begin{table}[H]
+\centering
+\caption{اثر حدس اولیه بر همگرایی روش نیوتن برای $f(x)=x^3-x-1$}
+\label{tab:initial-guess}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{c c c}
+\toprule[1.3pt]
+حدس اولیه $x_0$ & ریشه نهایی & وضعیت همگرایی \\
+\midrule[1pt]
+$0$ & $1.324718$ & همگرا \\
+$1$ & $1.324718$ & همگرا \\
+$2$ & $1.324718$ & همگرا \\
+$-1$ & $1.324718$ & همگرا با تکرار بیشتر \\
+\bottomrule[1.3pt]
+\end{tabular}
+\end{table}
+
+نتایج جدول \ref{tab:initial-guess} نشان می‌دهد که برای این تابع، روش نیوتن نسبتاً رفتار مناسبی دارد و از چند حدس اولیه مختلف به ریشه حقیقی همگرا می‌شود. با این حال، این رفتار برای همه توابع تضمین‌شده نیست.
+
+\section{نمونه‌ای از شکست روش نیوتن}
+
+با وجود سرعت بالای روش نیوتن، این روش ممکن است در برخی شرایط شکست بخورد. یکی از حالت‌های مهم شکست زمانی رخ می‌دهد که مقدار مشتق در نقطه تکرار صفر یا بسیار نزدیک به صفر باشد.
+
+به عنوان نمونه، تابع زیر را در نظر بگیرید:
+\begin{equation}
+f(x)=x^3-2x+2.
+\label{eq:ch4-fail-func}
+\end{equation}
+مشتق تابع برابر است با:
+\begin{equation}
+f'(x)=3x^2-2.
+\label{eq:ch4-fail-deriv}
+\end{equation}
+اگر حدس اولیه به صورت زیر انتخاب شود:
+\[
+x_0=0,
+\]
+آنگاه داریم:
+\[
+f(0)=2,\qquad f'(0)=-2.
+\]
+بنابراین:
+\[
+x_1 = 0-\frac{2}{-2} = 1.
+\]
+حال برای $x_1=1$ داریم:
+\[
+f(1)=1,\qquad f'(1)=1.
+\]
+پس:
+\[
+x_2 = 1-\frac{1}{1} = 0.
+\]
+در نتیجه دنباله تولید شده به صورت زیر خواهد بود:
+\[
+0,\ 1,\ 0,\ 1,\ 0,\ 1,\ldots
+\]
+این دنباله به هیچ ریشه‌ای همگرا نمی‌شود و بین دو مقدار ۰ و ۱ نوسان می‌کند.
+
+\begin{table}[H]
+\centering
+\caption{نمونه نوسان و عدم همگرایی در روش نیوتن}
+\label{tab:failure}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{c c c c}
+\toprule[1.3pt]
+$n$ & $x_n$ & $f(x_n)$ & $f'(x_n)$ \\
+\midrule[1pt]
+0 & 0 & 2 & -2 \\
+1 & 1 & 1 & 1 \\
+2 & 0 & 2 & -2 \\
+3 & 1 & 1 & 1 \\
+4 & 0 & 2 & -2 \\
+\bottomrule[1.3pt]
+\end{tabular}
+\end{table}
+
+این مثال نشان می‌دهد که روش نیوتن با وجود قدرت زیاد، همیشه همگرا نیست و انتخاب حدس اولیه در آن اهمیت اساسی دارد.
+
+\section{مقایسه نموداری خطاها}
+
+در شکل \ref{fig:error-comparison}، خطای سه مثال قبلی در یک نمودار مشترک نمایش داده شده است. محور عمودی به صورت لگاریتمی رسم شده است تا کاهش سریع خطا بهتر قابل مشاهده باشد.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+width=12cm,
+height=7cm,
+xlabel={شماره تکرار},
+ylabel={خطا},
+ymode=log,
+grid=both,
+legend pos=north east
+]
+
+\addplot[mark=*] coordinates {
+(0,0.324718)
+(1,0.175282)
+(2,0.023108)
+(3,0.000482)
+(4,0.000001)
+};
+
+\addplot[mark=square*] coordinates {
+(0,0.567143)
+(1,0.067143)
+(2,0.000832)
+(3,0.000001)
+};
+
+\addplot[mark=triangle*] coordinates {
+(0,0.260915)
+(1,0.011279)
+(2,0.000028)
+(3,0.000001)
+};
+
+\legend{
+$x^3-x-1$,
+$e^{-x}-x$,
+$\cos x-x$
+}
+
+\end{axis}
+\end{tikzpicture}
+\caption{مقایسه کاهش خطا در سه مثال عددی}
+\label{fig:error-comparison}
+\end{figure}
+
+از نمودار \ref{fig:error-comparison} مشخص است که هر سه مثال با سرعت زیادی به خطای کمتر از $10^{-6}$ رسیده‌اند. تفاوت جزئی در تعداد تکرارها به شکل تابع، حدس اولیه و مقدار مشتق در نزدیکی ریشه بستگی دارد.
+
+\section{تحلیل نهایی همگرایی}
+
+بر اساس نتایج عددی به‌دست‌آمده، روش نیوتن در صورت برقرار بودن شرایط مناسب، دارای همگرایی بسیار سریع است. شرایط اصلی همگرایی مطلوب را می‌توان به صورت زیر بیان کرد:
+\begin{itemize}
+\item تابع $f$ در نزدیکی ریشه مشتق‌پذیر باشد؛
+\item مشتق تابع در ریشه صفر نباشد، یعنی $f'(\alpha)\neq 0$؛
+\item حدس اولیه به اندازه کافی به ریشه نزدیک باشد؛
+\item مقدار مشتق در طول فرآیند تکرار خیلی کوچک نشود.
+\end{itemize}
+
+اگر این شرایط برقرار باشند، خطای روش تقریباً از رابطه زیر پیروی می‌کند:
+\begin{equation}
+e_{n+1}
+\approx
+\frac{f''(\alpha)}{2f'(\alpha)}e_n^2.
+\label{eq:ch4-error-relation}
+\end{equation}
+
+این رابطه نشان می‌دهد که خطای تکرار بعدی متناسب با مربع خطای تکرار قبلی است (\eqref{eq:ch4-quadratic}). بنابراین اگر $e_n$ کوچک باشد، مقدار $e_{n+1}$ بسیار کوچک‌تر خواهد شد. این ویژگی دلیل اصلی سرعت بالای روش نیوتن است.
+
+\section{مزایا و محدودیت‌های مشاهده‌شده}
+
+بر اساس بررسی‌های عددی انجام‌شده در این فصل، می‌توان مزایای روش نیوتن را به صورت زیر خلاصه کرد:
+\begin{itemize}
+\item سرعت همگرایی بسیار بالا؛
+\item نیاز به تعداد تکرار کم؛
+\item دقت نهایی زیاد؛
+\item مناسب برای حل بسیاری از معادلات غیرخطی تک‌متغیره.
+\end{itemize}
+
+با این حال، محدودیت‌های زیر نیز مشاهده می‌شود:
+\begin{itemize}
+\item نیاز به محاسبه مشتق تابع؛
+\item حساسیت نسبت به حدس اولیه؛
+\item احتمال شکست در نقاطی که مشتق صفر یا نزدیک به صفر است؛
+\item امکان نوسان یا واگرایی برای برخی توابع و حدس‌های اولیه.
+\end{itemize}
+
+بنابراین روش نیوتن اگرچه یکی از قدرتمندترین روش‌های عددی است، اما استفاده مؤثر از آن نیازمند دقت در انتخاب حدس اولیه و بررسی رفتار تابع است.
+
+\section{گراف فهرست}
+
+\usetikzlibrary{mindmap}
+
+\begin{figure}[H]
+\centering
+\scriptsize
+\begin{tikzpicture}[
+    scale=0.9,
+    main/.style={
+        circle, draw=blue!80, fill=blue!10, minimum size=2cm,
+        inner sep=0pt, font=\tiny\bfseries, align=center
+    },
+    sub/.style={
+        circle, draw=black!60, fill=white, minimum size=1.7cm,
+        inner sep=0pt, font=\tiny, align=center
+    },
+    line/.style={draw, thin}
+]
+
+% ===== گره مرکزی =====
+\node[main, fill=green!15, minimum size=1.6cm] (root) at (0,0) {پروژه\\نیوتن};
+
+% ===== فصل ۱ (بالا) =====
+\node[main] (ch1) at (0, 5.5) {\hyperref[ch:intro]{فصل ۱}};
+\draw[line] (root) -- (ch1);
+
+\node[sub] (ch1a) at (-2.2, 7.0) {\hyperref[sec:import]{معادلات}};
+\node[sub] (ch1b) at (0, 7.5) {\hyperref[sec:num]{عددی روش‌های}};
+\node[sub] (ch1c) at (2.2, 7.0) {\hyperref[sec:state]{مسئله بیان}};
+\draw[line] (ch1) -- (ch1a);
+\draw[line] (ch1) -- (ch1b);
+\draw[line] (ch1) -- (ch1c);
+
+% ===== فصل ۲ (راست) =====
+\node[main] (ch2) at (5.5, 0) {\hyperref[ch:theory]{فصل ۲}};
+\draw[line] (root) -- (ch2);
+
+\node[sub] (ch2a) at (7.0, 2.2) {\hyperref[sec:root]{ریشه‌یابی}};
+\node[sub] (ch2b) at (7.5, 0) {\hyperref[sec:formula]{فرمول}};
+\node[sub] (ch2c) at (7.0, -2.2) {\hyperref[sec:conv]{همگرایی}};
+\draw[line] (ch2) -- (ch2a);
+\draw[line] (ch2) -- (ch2b);
+\draw[line] (ch2) -- (ch2c);
+
+% ===== فصل ۳ (پایین) =====
+\node[main] (ch3) at (0, -5.5) {\hyperref[ch:algorithm]{فصل ۳}};
+\draw[line] (root) -- (ch3);
+
+\node[sub] (ch3a) at (-2.2, -7.0) {\hyperref[sec:pseudo]{شبه‌کد}};
+\node[sub] (ch3b) at (0, -7.5) {\hyperref[sec:stop]{ توقف معیار}};
+\node[sub] (ch3c) at (2.2, -7.0) {\hyperref[sec:flow]{فلوچارت}};
+\draw[line] (ch3) -- (ch3a);
+\draw[line] (ch3) -- (ch3b);
+\draw[line] (ch3) -- (ch3c);
+
+% ===== فصل ۴ (چپ) =====
+\node[main] (ch4) at (-5.5, 0) {\hyperref[ch:results]{فصل ۴}};
+\draw[line] (root) -- (ch4);
+
+\node[sub] (ch4a) at (-7.0, 2.2) {\hyperref[sec:examples]{سه مثال}};
+\node[sub] (ch4b) at (-7.5, 0) {\hyperref[sec:plots]{نمودار}};
+\node[sub] (ch4c) at (-7.0, -2.2) {\hyperref[sec:comp]{مقایسه}};
+\draw[line] (ch4) -- (ch4a);
+\draw[line] (ch4) -- (ch4b);
+\draw[line] (ch4) -- (ch4c);
+
+\end{tikzpicture}
+\caption{نقشه تعاملی پروژه (کلیک روی هر دایره شما را به فصل یا زیربخش مربوطه می‌برد).}
+\label{fig:project-map}
+\end{figure}
+
+\section{جمع‌بندی}
+
+در این فصل، روش نیوتن از نظر عددی برای چند معادله غیرخطی بررسی شد. نتایج نشان داد که این روش در مثال‌های مختلف تنها با تعداد کمی تکرار به جواب دقیق می‌رسد. همچنین نمودارهای خطا نشان دادند که کاهش خطا در روش نیوتن بسیار سریع است و با ویژگی همگرایی درجه دوم (\eqref{eq:ch4-quadratic}) سازگاری دارد.
+
+در مثال‌های بررسی‌شده، روش نیوتن برای توابع چندجمله‌ای، نمایی و مثلثاتی عملکرد بسیار خوبی داشت. با این حال، نمونه‌ای نیز ارائه شد که در آن روش نیوتن به دلیل انتخاب نامناسب حدس اولیه دچار نوسان شده و به جواب همگرا نمی‌شود.
+
+به طور کلی، نتایج این فصل نشان می‌دهد که روش نیوتن در صورت انتخاب حدس اولیه مناسب و غیرصفر بودن مشتق در نزدیکی ریشه، یکی از سریع‌ترین و دقیق‌ترین روش‌ها برای حل معادلات غیرخطی است.

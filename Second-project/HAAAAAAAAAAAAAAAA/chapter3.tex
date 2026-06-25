@@ -1,0 +1,448 @@
+\chapter{الگوریتم و پیاده‌سازی روش نیوتن}\label{ch:algorithm}
+\label{chap:newton-algorithm}
+
+\section{مقدمه}
+
+در فصل قبل، مبانی نظری روش نیوتن و نحوه استخراج فرمول آن بررسی شد. در این فصل، روش نیوتن از دیدگاه الگوریتمی و محاسباتی مورد مطالعه قرار می‌گیرد. هدف اصلی این فصل آن است که رابطه ریاضی روش نیوتن به یک روند اجرایی گام‌به‌گام تبدیل شود تا بتوان آن را در حل عددی معادلات غیرخطی به کار برد.
+
+روش نیوتن برای حل معادلاتی از فرم کلی
+
+\begin{equation}
+f(x)=0
+\label{eq:nonlinear-equation-ch3}
+\end{equation}
+
+به کار می‌رود. در این روش، با شروع از یک حدس اولیه مناسب، دنباله‌ای از تقریب‌ها تولید می‌شود که در شرایط مناسب به ریشه معادله همگرا خواهد شد.
+
+فرمول اصلی روش نیوتن به صورت زیر است:
+
+\begin{equation}
+x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}.
+\label{eq:newton-main-ch3}
+\end{equation}
+
+در رابطه \eqref{eq:newton-main-ch3}، مقدار \(x_n\) تقریب فعلی ریشه و مقدار \(x_{n+1}\) تقریب جدید ریشه است. همچنین \(f'(x_n)\) مشتق تابع در نقطه \(x_n\) را نشان می‌دهد.
+
+در طراحی یک الگوریتم عددی برای روش نیوتن، باید ورودی‌ها، خروجی‌ها، معیار توقف، کنترل خطا و شرایط شکست الگوریتم مشخص شوند. از آنجا که روش نیوتن یک روش تکراری است، پیاده‌سازی آن معمولاً بر اساس یک حلقه تکرار انجام می‌شود.
+
+\section{فرم الگوریتمی روش نیوتن}
+
+برای حل معادله \eqref{eq:nonlinear-equation-ch3} با استفاده از روش نیوتن، مراحل اصلی الگوریتم به صورت زیر است:
+
+\begin{enumerate}
+    \item انتخاب یک حدس اولیه مناسب \(x_0\)؛
+    \item محاسبه مقدار تابع \(f(x_n)\) و مشتق آن \(f'(x_n)\)؛
+    \item تولید تقریب جدید با استفاده از رابطه \eqref{eq:newton-main-ch3}؛
+    \item بررسی معیار توقف؛
+    \item در صورت برقرار نبودن معیار توقف، تکرار مراحل قبل.
+\end{enumerate}
+
+یکی از نکات مهم در اجرای روش نیوتن، بررسی مقدار مشتق است. اگر در یکی از تکرارها داشته باشیم:
+
+\begin{equation}
+f'(x_n)=0,
+\label{eq:zero-derivative-ch3}
+\end{equation}
+
+آنگاه رابطه \eqref{eq:newton-main-ch3} تعریف‌شده نخواهد بود، زیرا تقسیم بر صفر رخ می‌دهد. بنابراین در پیاده‌سازی عملی الگوریتم، باید پیش از محاسبه تقریب جدید، مقدار مشتق بررسی شود (این کنترل در خط \ref{line:check-derivative} از الگوریتم \ref{alg:newton-method} دیده می‌شود).
+
+همچنین برای جلوگیری از اجرای بی‌پایان الگوریتم، معمولاً یک حداکثر تعداد تکرار با نماد \(N_{\max}\) در نظر گرفته می‌شود. اگر الگوریتم تا این تعداد تکرار به جواب مطلوب نرسد، فرایند متوقف شده و عدم همگرایی گزارش می‌شود (خطوط \ref{line:while-start} و \ref{line:not-converged}).
+
+\section{شبه‌کد الگوریتم روش نیوتن}
+\label{sec:pseudo}
+
+در این بخش، شبه‌کد روش نیوتن ارائه می‌شود. ورودی‌های الگوریتم شامل تابع \(f\)، مشتق آن \(f'\)، حدس اولیه \(x_0\)، تلورانس یا دقت مورد نظر \(\varepsilon\) و حداکثر تعداد تکرار \(N_{\max}\) است. خروجی الگوریتم نیز تقریب ریشه معادله است.
+
+همان‌طور که در الگوریتم \ref{alg:newton-method} مشاهده می‌شود، ابتدا مقدار اولیه تنظیم شده و سپس در هر تکرار، مقدار تابع و مشتق محاسبه می‌شود. در صورتی که مشتق صفر باشد، الگوریتم متوقف می‌شود. در غیر این صورت، تقریب جدید با استفاده از رابطه نیوتن محاسبه شده و معیار توقف بررسی می‌شود.
+
+\begin{algorithm}
+\caption{روش نیوتن برای حل معادله $f(x)=0$}
+\label{alg:newton-method}
+\begin{algorithmic}[1]
+
+\Require تابع $f(x)$، مشتق $f'(x)$، حدس اولیه $x_0$، تلورانس $\varepsilon$، حداکثر تکرار $N_{\max}$
+\Ensure تقریب ریشه معادله
+
+\State $x \leftarrow x_0$
+\State $n \leftarrow 0$
+\label{line:init}
+
+\While{$n < N_{\max}$} \label{line:while-start}
+
+    \State محاسبه $f(x)$ \label{line:calc-f}
+    \State محاسبه $f'(x)$ \label{line:calc-df}
+
+    \If{$f'(x)=0$} \label{line:check-derivative}
+        \State توقف؛ مشتق صفر است و ادامه روش امکان‌پذیر نیست. \label{line:stop-derivative}
+    \EndIf
+
+    \State $x_{\mathrm{new}} \leftarrow x - \dfrac{f(x)}{f'(x)}$ \label{line:newton-update}
+
+    \If{$|x_{\mathrm{new}} - x| < \varepsilon$} \label{line:check-convergence}
+        \State \Return $x_{\mathrm{new}}$ \label{line:return-root}
+    \EndIf
+
+    \State $x \leftarrow x_{\mathrm{new}}$ \label{line:update-x}
+    \State $n \leftarrow n + 1$ \label{line:increment-n}
+
+\EndWhile
+
+\State توقف؛ الگوریتم در تعداد تکرار مجاز همگرا نشده است. \label{line:not-converged}
+
+\end{algorithmic}
+\end{algorithm}
+
+الگوریتم \ref{alg:newton-method} نمایش رسمی روند محاسباتی روش نیوتن است. این الگوریتم نشان می‌دهد که روش نیوتن تنها یک فرمول ریاضی نیست، بلکه یک فرایند تکراری کامل است که در آن کنترل خطا، بررسی مشتق و شرط توقف نقش اساسی دارند.
+
+\section{تحلیل گام‌به‌گام الگوریتم}
+
+الگوریتم روش نیوتن را می‌توان به چند مرحله اصلی تقسیم کرد. هر یک از این مراحل در دقت و پایداری روش نقش مهمی دارند. در ادامه این مراحل با اشاره به خطوط متناظر در الگوریتم \ref{alg:newton-method} توضیح داده می‌شود.
+
+\subsection{انتخاب حدس اولیه}
+
+اولین مرحله در روش نیوتن، انتخاب حدس اولیه \(x_0\) است. در الگوریتم، این مقدار در ابتدا در متغیر \(x\) قرار می‌گیرد (خط \ref{line:init}). انتخاب مناسب \(x_0\) تأثیر زیادی بر همگرایی روش دارد. اگر حدس اولیه به ریشه واقعی نزدیک باشد، روش نیوتن معمولاً با سرعت زیادی همگرا می‌شود. اما اگر حدس اولیه نامناسب باشد، ممکن است روش واگرا شود یا به ریشه‌ای متفاوت از ریشه مورد نظر همگرا گردد.
+
+\subsection{محاسبه تابع و مشتق}
+
+در هر تکرار، مقدار تابع و مشتق آن در نقطه فعلی محاسبه می‌شود (خطوط \ref{line:calc-f} و \ref{line:calc-df}):
+
+\begin{equation}
+f(x_n), \qquad f'(x_n).
+\label{eq:function-derivative-ch3}
+\end{equation}
+
+مقدار \(f(x_n)\) نشان می‌دهد که تقریب فعلی تا چه اندازه از ریشه فاصله دارد. مقدار مشتق \(f'(x_n)\) نیز شیب خط مماس بر نمودار تابع در نقطه \(x_n\) را مشخص می‌کند. سپس مشتق با صفر مقایسه می‌شود (خط \ref{line:check-derivative}) تا از تعریف‌نشدن فرمول نیوتن جلوگیری شود.
+
+\subsection{محاسبه تقریب جدید}
+
+پس از محاسبه تابع و مشتق، تقریب جدید با استفاده از رابطه نیوتن محاسبه می‌شود (خط \ref{line:newton-update}):
+
+\begin{equation}
+x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}.
+\label{eq:newton-update-ch3}
+\end{equation}
+
+این رابطه از نظر هندسی به معنای پیدا کردن محل برخورد خط مماس بر نمودار تابع با محور افقی است. نقطه برخورد این خط با محور \(x\)، به عنوان تقریب بعدی ریشه انتخاب می‌شود.
+
+\subsection{بررسی معیار توقف}
+
+یکی از معیارهای رایج توقف در روش نیوتن، بررسی اختلاف دو تقریب متوالی است که در خط \ref{line:check-convergence} پیاده‌سازی شده است:
+
+\begin{equation}
+|x_{n+1}-x_n|<\varepsilon.
+\label{eq:stopping-difference-ch3}
+\end{equation}
+
+در رابطه \eqref{eq:stopping-difference-ch3}، مقدار \(\varepsilon\) دقت مورد نظر است. اگر اختلاف دو تقریب متوالی از این مقدار کمتر شود، می‌توان نتیجه گرفت که الگوریتم به تقریب قابل قبولی از ریشه رسیده است و ریشه بازگردانده می‌شود (خط \ref{line:return-root}).
+
+معیار توقف دیگری که می‌توان استفاده کرد، بررسی مقدار تابع در تقریب جدید است:
+
+\begin{equation}
+|f(x_{n+1})|<\varepsilon.
+\label{eq:stopping-function-ch3}
+\end{equation}
+
+در بسیاری از پیاده‌سازی‌ها، برای اطمینان بیشتر، هر دو معیار \eqref{eq:stopping-difference-ch3} و \eqref{eq:stopping-function-ch3} مورد توجه قرار می‌گیرند. همچنین الگوریتم با یک حلقه محدود (خط \ref{line:while-start}) از تکرار بی‌نهایت جلوگیری می‌کند و در صورت عبور از \(N_{\max}\)، وضعیت عدم همگرایی را گزارش می‌دهد (خط \ref{line:not-converged}).
+
+\section{معیارهای توقف و کنترل خطا}
+\label{sec:stop}
+
+در روش‌های عددی، تعیین زمان توقف الگوریتم اهمیت زیادی دارد. اگر الگوریتم زودتر از زمان مناسب متوقف شود، جواب به دست آمده دقت کافی نخواهد داشت. از سوی دیگر، اگر الگوریتم بیش از حد ادامه یابد، محاسبات اضافی انجام شده و ممکن است زمان اجرای برنامه افزایش یابد.
+
+در روش نیوتن، معیارهای توقف رایج عبارت‌اند از:
+
+\begin{enumerate}
+    \item کوچک شدن اختلاف دو تقریب متوالی (خط \ref{line:check-convergence})؛
+    \item کوچک شدن مقدار تابع در تقریب فعلی؛
+    \item رسیدن به حداکثر تعداد تکرار (خط \ref{line:while-start}).
+\end{enumerate}
+
+معیار اول به صورت رابطه \eqref{eq:stopping-difference-ch3} بیان شد. معیار دوم نیز با رابطه \eqref{eq:stopping-function-ch3} نشان داده شد.
+
+برای جلوگیری از اجرای بی‌نهایت الگوریتم، شرط زیر نیز در نظر گرفته می‌شود:
+
+\begin{equation}
+n<N_{\max}.
+\label{eq:max-iteration-ch3}
+\end{equation}
+
+در صورتی که تعداد تکرارها به \(N_{\max}\) برسد و هنوز معیار توقف برقرار نشده باشد، الگوریتم متوقف شده و نتیجه به عنوان عدم همگرایی گزارش می‌شود (خط \ref{line:not-converged}).
+
+گاهی برای افزایش دقت، از خطای نسبی نیز استفاده می‌شود:
+
+\begin{equation}
+E_r=\frac{|x_{n+1}-x_n|}{\max(1,|x_{n+1}|)}.
+\label{eq:relative-error-ch3}
+\end{equation}
+
+در رابطه \eqref{eq:relative-error-ch3}، استفاده از عبارت \(\max(1,|x_{n+1}|)\) باعث می‌شود که در صورت کوچک بودن مقدار \(x_{n+1}\)، از ایجاد خطای عددی نامناسب جلوگیری شود.
+
+\section{پیچیدگی محاسباتی روش نیوتن}
+
+در هر تکرار از روش نیوتن، چند عملیات اصلی انجام می‌شود. مهم‌ترین این عملیات عبارت‌اند از:
+
+\begin{itemize}
+    \item محاسبه مقدار تابع \(f(x_n)\) (خط \ref{line:calc-f})؛
+    \item محاسبه مقدار مشتق \(f'(x_n)\) (خط \ref{line:calc-df})؛
+    \item انجام یک تقسیم (خط \ref{line:newton-update})؛
+    \item انجام چند عمل جمع و تفریق.
+\end{itemize}
+
+اگر هزینه محاسبه تابع را با \(C_f\) و هزینه محاسبه مشتق را با \(C_{f'}\) نشان دهیم، هزینه هر تکرار روش نیوتن را می‌توان به صورت زیر نوشت:
+
+\begin{equation}
+T_{\mathrm{iteration}}=C_f+C_{f'}+O(1).
+\label{eq:iteration-cost-ch3}
+\end{equation}
+
+اگر الگوریتم پس از \(k\) تکرار همگرا شود، هزینه کل اجرای الگوریتم برابر است با:
+
+\begin{equation}
+T_{\mathrm{total}}=k(C_f+C_{f'}+O(1)).
+\label{eq:total-cost-ch3}
+\end{equation}
+
+در رابطه \eqref{eq:total-cost-ch3}، مقدار \(k\) تعداد تکرارهای لازم برای رسیدن به دقت مطلوب است. از آنجا که روش نیوتن در شرایط مناسب دارای همگرایی درجه دوم است، معمولاً تعداد تکرارهای مورد نیاز برای رسیدن به جواب دقیق، نسبتاً کم است. با این حال، اگر محاسبه مشتق پرهزینه باشد، استفاده از روش‌هایی مانند روش سکانت ممکن است مناسب‌تر باشد.
+
+\section{فلوچارت روش نیوتن}
+\label{sec:flow}
+
+در این بخش، فلوچارت روش نیوتن با استفاده از بسته $TikZ$ ارائه می‌شود. فلوچارت، روند اجرای الگوریتم را به صورت گرافیکی نمایش می‌دهد و نشان می‌دهد که الگوریتم از دریافت ورودی‌ها شروع شده، سپس وارد حلقه تکرار می‌شود و در صورت برقراری شرط توقف، پایان می‌یابد.
+
+شکل \ref{fig:newton-flowchart} روند کلی اجرای روش نیوتن را نشان می‌دهد.
+
+\begin{figure}[H]
+\centering
+
+\begin{tikzpicture}[
+    node distance=2cm,
+    startstop/.style={
+        rectangle,
+        rounded corners,
+        minimum width=3.2cm,
+        minimum height=1cm,
+        text centered,
+        draw=black
+    },
+    process/.style={
+        rectangle,
+        minimum width=4cm,
+        minimum height=1cm,
+        text centered,
+        draw=black
+    },
+    decision/.style={
+        diamond,
+        aspect=2,
+        minimum width=3.5cm,
+        minimum height=1cm,
+        text centered,
+        draw=black
+    },
+    arrow/.style={
+        thick,
+        ->,
+        >=stealth
+    }
+]
+
+\node (start) [startstop] {شروع};
+
+\node (input) [process, below of=start] 
+{دریافت $f$، $f'$، $x_0$، $\varepsilon$، $N_{\max}$};
+
+\node (init) [process, below of=input] 
+{$x \leftarrow x_0$ ، $n \leftarrow 0$};
+
+\node (checkn) [decision, below of=init, yshift=-0.3cm] 
+{$n<N_{\max}$؟};
+
+\node (calc) [process, below of=checkn, yshift=-0.4cm] 
+{محاسبه $f(x)$ و $f'(x)$};
+
+\node (checkd) [decision, below of=calc, yshift=-0.5cm] 
+{$f'(x)=0$؟};
+
+\node (update) [process, below of=checkd, yshift=-0.6cm] 
+{$x_{\mathrm{new}}=x-\dfrac{f(x)}{f'(x)}$};
+
+\node (checke) [decision, below of=update, yshift=-0.6cm] 
+{$|x_{\mathrm{new}}-x|<\varepsilon$؟};
+
+\node (answer) [startstop, below of=checke, yshift=-0.6cm] 
+{اعلام ریشه و پایان};
+
+\node (repeat) [process, right of=checke, xshift=6cm] 
+{$x \leftarrow x_{\mathrm{new}}$ ، $n \leftarrow n+1$};
+
+\node (faild) [startstop, right of=checkd, xshift=4.5cm] 
+{توقف: مشتق صفر};
+
+\node (failn) [startstop, right of=checkn, xshift=4.5cm] 
+{توقف: عدم همگرایی};
+
+\draw [arrow] (start) -- (input);
+\draw [arrow] (input) -- (init);
+\draw [arrow] (init) -- (checkn);
+
+\draw [arrow] (checkn) -- node[anchor=east] {بله} (calc);
+\draw [arrow] (checkn) -- node[anchor=south] {خیر} (failn);
+
+\draw [arrow] (calc) -- (checkd);
+\draw [arrow] (checkd) -- node[anchor=east] {خیر} (update);
+\draw [arrow] (checkd) -- node[anchor=south] {بله} (faild);
+
+\draw [arrow] (update) -- (checke);
+\draw [arrow] (checke) -- node[anchor=east] {بله} (answer);
+\draw [arrow] (checke) -- node[anchor=south] {خیر} (repeat);
+
+\draw [arrow] (repeat.east) -- ++(1,0) -- ++(0,11) -| (checkn);
+
+\end{tikzpicture}
+
+\caption{فلوچارت روش نیوتن برای حل معادله غیرخطی}
+\label{fig:newton-flowchart}
+\end{figure}
+
+همان‌طور که در شکل \ref{fig:newton-flowchart} مشاهده می‌شود، الگوریتم روش نیوتن علاوه بر محاسبه تقریب جدید، دو کنترل مهم را نیز انجام می‌دهد. کنترل اول مربوط به صفر نبودن مشتق است و کنترل دوم مربوط به بررسی همگرایی الگوریتم است.
+
+\section{ساختار پیاده‌سازی عددی}
+
+برای پیاده‌سازی روش نیوتن در یک زبان برنامه‌نویسی، باید اجزای اصلی الگوریتم به صورت دقیق مشخص شوند. ورودی‌های پیاده‌سازی شامل موارد زیر هستند:
+
+\begin{itemize}
+    \item تابع مورد نظر \(f(x)\)؛
+    \item مشتق تابع \(f'(x)\)؛
+    \item حدس اولیه \(x_0\)؛
+    \item دقت مورد نظر \(\varepsilon\)؛
+    \item حداکثر تعداد تکرار \(N_{\max}\).
+\end{itemize}
+
+خروجی‌های مناسب برای این پیاده‌سازی عبارت‌اند از:
+
+\begin{itemize}
+    \item تقریب نهایی ریشه؛
+    \item تعداد تکرارهای انجام‌شده؛
+    \item مقدار خطای نهایی؛
+    \item وضعیت همگرایی یا عدم همگرایی.
+\end{itemize}
+
+در ادامه یک نمونه کد مفهومی برای پیاده‌سازی روش نیوتن ارائه می‌شود. این کد صرفاً برای نمایش ساختار الگوریتم است و می‌تواند در زبان‌های برنامه‌نویسی مختلف پیاده‌سازی شود.
+
+\begin{latin}
+\begin{verbatim}
+def newton(f, df, x0, tol=1e-6, max_iter=100):
+    x = x0
+
+    for n in range(max_iter):
+        fx = f(x)
+        dfx = df(x)
+
+        if dfx == 0:
+            return None, n, "Zero derivative"
+
+        x_new = x - fx / dfx
+
+        error = abs(x_new - x)
+
+        if error < tol:
+            return x_new, n + 1, "Converged"
+
+        x = x_new
+
+    return x, max_iter, "Not converged"
+\end{verbatim}
+\end{latin}
+
+این پیاده‌سازی با دریافت تابع، مشتق، حدس اولیه و معیار توقف، تلاش می‌کند تقریب مناسبی از ریشه به دست آورد. در صورتی که مشتق صفر شود، برنامه متوقف شده و پیام مناسب بازگردانده می‌شود. همچنین اگر تعداد تکرارها به مقدار مجاز برسد و شرط توقف برقرار نشود، وضعیت عدم همگرایی گزارش می‌شود.
+
+\section{مثال اجرای الگوریتم}
+
+برای نمایش نحوه عملکرد الگوریتم، معادله زیر را در نظر می‌گیریم:
+
+\begin{equation}
+f(x)=x^2-2.
+\label{eq:example-function-ch3}
+\end{equation}
+
+هدف، یافتن ریشه مثبت این معادله است. ریشه مثبت این معادله برابر است با:
+
+\begin{equation}
+\alpha=\sqrt{2}.
+\label{eq:sqrt2-root-ch3}
+\end{equation}
+
+مشتق تابع \eqref{eq:example-function-ch3} برابر است با:
+
+\begin{equation}
+f'(x)=2x.
+\label{eq:example-derivative-ch3}
+\end{equation}
+
+با جایگذاری روابط \eqref{eq:example-function-ch3} و \eqref{eq:example-derivative-ch3} در فرمول نیوتن، داریم:
+
+\begin{align}
+x_{n+1}
+&=x_n-\frac{f(x_n)}{f'(x_n)}
+\nonumber\\
+&=x_n-\frac{x_n^2-2}{2x_n}
+\nonumber\\
+&=\frac{2x_n^2-(x_n^2-2)}{2x_n}
+\nonumber\\
+&=\frac{x_n^2+2}{2x_n}.
+\label{eq:newton-sqrt2-update-ch3}
+\end{align}
+
+رابطه \eqref{eq:newton-sqrt2-update-ch3} فرمول تکراری روش نیوتن برای تقریب مقدار \(\sqrt{2}\) است.
+
+اگر حدس اولیه را برابر با
+
+\begin{equation}
+x_0=1
+\label{eq:initial-guess-ch3}
+\end{equation}
+
+در نظر بگیریم، تکرارهای روش نیوتن به صورت زیر محاسبه می‌شوند:
+
+\begin{equation}
+x_1=\frac{x_0^2+2}{2x_0}
+=\frac{1^2+2}{2(1)}
+=\frac{3}{2}
+=1.5.
+\label{eq:x1-ch3}
+\end{equation}
+
+برای تکرار دوم داریم:
+
+\begin{equation}
+x_2=\frac{x_1^2+2}{2x_1}
+=\frac{(1.5)^2+2}{2(1.5)}
+=\frac{4.25}{3}
+\approx 1.4167.
+\label{eq:x2-ch3}
+\end{equation}
+
+برای تکرار سوم نیز خواهیم داشت:
+
+\begin{equation}
+x_3=\frac{x_2^2+2}{2x_2}
+\approx 1.4142.
+\label{eq:x3-ch3}
+\end{equation}
+
+همان‌طور که مشاهده می‌شود، مقدار به‌دست‌آمده به سرعت به مقدار واقعی \(\sqrt{2}\) نزدیک می‌شود:
+
+\begin{equation}
+\sqrt{2}\approx 1.41421356.
+\label{eq:sqrt2-value-ch3}
+\end{equation}
+
+این مثال نشان می‌دهد که روش نیوتن در صورت انتخاب حدس اولیه مناسب، می‌تواند با تعداد کمی تکرار به تقریب بسیار دقیقی از ریشه برسد.
+
+\section{جمع‌بندی فصل}
+
+در این فصل، روش نیوتن از دیدگاه الگوریتمی و محاسباتی بررسی شد. ابتدا فرم کلی الگوریتم و مراحل اصلی آن بیان شد. سپس شبه‌کد رسمی روش نیوتن در قالب الگوریتم \ref{alg:newton-method} ارائه گردید و خطوط کلیدی آن برای ارجاع در متن نشانه‌گذاری شدند. در ادامه، معیارهای توقف، کنترل خطا و پیچیدگی محاسباتی روش با استناد به همان خطوط مورد بحث قرار گرفت.
+
+همچنین فلوچارت روش نیوتن در شکل \ref{fig:newton-flowchart} ارائه شد که روند اجرای الگوریتم را به صورت گرافیکی نمایش می‌دهد. در پایان نیز یک مثال عددی برای حل معادله \(x^2-2=0\) بررسی شد و نشان داده شد که روش نیوتن با شروع از حدس اولیه مناسب، به سرعت به مقدار \(\sqrt{2}\) همگرا می‌شود.
+
+مطالب این فصل زمینه لازم برای ورود به فصل بعد را فراهم می‌کند. در فصل بعد، نتایج عددی روش نیوتن با استفاده از جدول‌ها، نمودارها و تحلیل خطا بررسی خواهد شد.
